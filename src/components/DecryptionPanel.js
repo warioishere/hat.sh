@@ -8,190 +8,40 @@ import {
   crypto_secretstream_xchacha20poly1305_ABYTES,
   CHUNK_SIZE,
 } from "../config/Constants";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import TextField from "@material-ui/core/TextField";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import Backdrop from "@material-ui/core/Backdrop";
-import Collapse from "@material-ui/core/Collapse";
-import LockOpenIcon from "@material-ui/icons/LockOpen";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import DescriptionIcon from "@material-ui/icons/Description";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import CloseIcon from "@material-ui/icons/Close";
-import AddIcon from "@material-ui/icons/Add";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import { Alert, AlertTitle } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Backdrop from "@mui/material/Backdrop";
+import Collapse from "@mui/material/Collapse";
+import Box from "@mui/material/Box";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DescriptionIcon from "@mui/icons-material/Description";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import { getTranslations as t } from "../../locales";
 import {
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-  },
-  offline: {
-    fontSize: 12,
-    float: "right",
-    color: theme.palette.diamondBlack.main,
-  },
-  stepper: {
-    backgroundColor: "transparent",
-  },
-
-  stepIcon: {
-    "&$activeStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-    "&$completedStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-  },
-  activeStepIcon: {},
-  completedStepIcon: {},
-
-  button: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.mercury.light,
-    "&:hover": {
-      backgroundColor: theme.palette.mercury.main,
-    },
-    transition: "background-color 0.2s ease-out",
-  },
-
-  browseButton: {
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.alto.light,
-    "&:hover": {
-      backgroundColor: theme.palette.alto.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  resetButton: {
-    marginLeft: 8,
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.flower.text,
-    backgroundColor: theme.palette.flower.main,
-    "&:hover": {
-      backgroundColor: theme.palette.flower.light,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  backButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.mercury.main,
-  },
-  nextButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.white.main,
-    "&:hover": {
-      backgroundColor: theme.palette.mineShaft.main,
-    },
-    transition: "color .01s",
-  },
-
-  actionsContainer: {
-    marginBottom: theme.spacing(2),
-  },
-  resetContainer: {
-    padding: theme.spacing(3),
-    boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
-    borderRadius: "8px",
-  },
-
-  input: {
-    display: "none",
-  },
-
-  fileArea: {
-    padding: "20px",
-    border: "5px dashed",
-    borderColor: theme.palette.gallery.main,
-    borderRadius: "14px",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-    marginBottom: "10px",
-  },
-
-  filesInfo: {
-    float: "right",
-    marginTop: 15,
-    textTransform: "none",
-    color: theme.palette.cottonBoll.text,
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  filesPaper: {
-    marginBottom: 15,
-    overflow: "auto",
-    maxHeight: "280px",
-    backgroundColor: "transparent",
-  },
-
-  filesList: {
-    display: "flex",
-    flex: "1",
-    flexWrap: "wrap",
-    alignContent: "center",
-    justifyContent: "center",
-  },
-
-  filesListItem: {
-    backgroundColor: "#f3f3f3",
-    borderRadius: "8px",
-    padding: 15,
-  },
-
-  filesListItemText: {
-    width: "100px",
-    maxWidth: "150px",
-    minHeight: "50px",
-    maxHeight: "50px",
-  },
-}));
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 let file,
   index,
@@ -205,8 +55,6 @@ let file,
   publicKey;
 
 export default function DecryptionPanel() {
-  const classes = useStyles();
-
   const router = useRouter();
 
   const query = router.query;
@@ -540,8 +388,32 @@ export default function DecryptionPanel() {
   const kickOffDecryption = async (e) => {
     if (currFile <= numberOfFiles - 1) {
       file = files[currFile];
-      window.open(`file`, "_self");
       setIsDownloading(true);
+
+      // Trigger download via fetch + blob for reliable cross-browser support
+      const formatName = (await import("../helpers/formatName")).formatName;
+      fetch("file").then((response) => {
+        const reader = response.body.getReader();
+        const chunks = [];
+        const pump = () =>
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              const blob = new Blob(chunks);
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = formatName(files[currFile].name);
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              return;
+            }
+            chunks.push(value);
+            return pump();
+          });
+        pump();
+      });
 
       if (decryptionMethodState === "secretKey") {
         navigator.serviceWorker.ready.then((reg) => {
@@ -805,7 +677,7 @@ export default function DecryptionPanel() {
   }, []);
 
   return (
-    <div className={classes.root} {...getRootProps()}>
+    <Box sx={{ width: "100%" }} {...getRootProps()}>
       <Backdrop open={isDragActive} style={{ zIndex: 10 }}>
         <Typography
           variant="h2"
@@ -846,15 +718,18 @@ export default function DecryptionPanel() {
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
-        className={classes.stepper}
+        sx={{ backgroundColor: "transparent" }}
       >
         <Step key={1}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
+              sx: {
+                "&.Mui-active": {
+                  color: "#525252",
+                },
+                "&.Mui-completed": {
+                  color: "#525252",
+                },
               },
             }}
           >
@@ -862,21 +737,56 @@ export default function DecryptionPanel() {
           </StepLabel>
           <StepContent>
             <div className="wrapper p-3" id="decFileWrapper">
-              <div
-                className={classes.fileArea}
+              <Box
                 id="decFileArea"
-                style={{ display: Files.length > 0 ? "" : "flex" }}
+                sx={{
+                  padding: "20px",
+                  border: "5px dashed",
+                  borderColor: "#ebebeb",
+                  borderRadius: "14px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  marginBottom: "10px",
+                  display: Files.length > 0 ? "" : "flex",
+                }}
               >
-                <Paper elevation={0} className={classes.filesPaper}>
-                  <List dense={true} className={classes.filesList}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    marginBottom: "15px",
+                    overflow: "auto",
+                    maxHeight: "280px",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  <List
+                    dense={true}
+                    sx={{
+                      display: "flex",
+                      flex: "1",
+                      flexWrap: "wrap",
+                      alignContent: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     {Files.length > 0
                       ? Files.map((file, index) => (
                           <ListItem
                             key={index}
-                            className={classes.filesListItem}
+                            sx={{
+                              backgroundColor: "#f3f3f3",
+                              borderRadius: "8px",
+                              padding: "15px",
+                            }}
                           >
                             <ListItemText
-                              className={classes.filesListItemText}
+                              sx={{
+                                width: "100px",
+                                maxWidth: "150px",
+                                minHeight: "50px",
+                                maxHeight: "50px",
+                              }}
                               primary={file.name}
                               secondary={formatBytes(file.size)}
                             />
@@ -898,7 +808,7 @@ export default function DecryptionPanel() {
 
                 <input
                   {...getInputProps()}
-                  className={classes.input}
+                  style={{ display: "none" }}
                   id="dec-file"
                   type="file"
                   onChange={(e) => handleFilesInput(e.target.files)}
@@ -906,7 +816,20 @@ export default function DecryptionPanel() {
                 />
                 <label htmlFor="dec-file">
                   <Button
-                    className={classes.browseButton}
+                    sx={{
+                      padding: "8px",
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#ebebeb",
+                      "&:hover": {
+                        backgroundColor: "#e1e1e1",
+                      },
+                      transition: "color .01s",
+                    }}
                     component="span"
                     startIcon={
                       Files.length > 0 ? <AddIcon /> : <DescriptionIcon />
@@ -920,34 +843,65 @@ export default function DecryptionPanel() {
                   <>
                     <Button
                       onClick={() => resetFilesInput()}
-                      className={classes.resetButton}
+                      sx={{
+                        marginLeft: "8px",
+                        padding: "8px",
+                        paddingLeft: "15px",
+                        paddingRight: "15px",
+                        textTransform: "none",
+                        borderRadius: "8px",
+                        border: "none",
+                        color: "#611a15",
+                        backgroundColor: "#fdecea",
+                        "&:hover": {
+                          backgroundColor: "#fadbd7",
+                        },
+                        transition: "color .01s",
+                      }}
                       component="span"
                       startIcon={<RotateLeftIcon />}
                     >
                       {t("reset")}
                     </Button>
 
-                    <small className={classes.filesInfo}>
+                    <Box
+                      component="small"
+                      sx={{
+                        float: "right",
+                        marginTop: "15px",
+                        textTransform: "none",
+                        color: "#0d3c61",
+                        transition: "color .01s",
+                      }}
+                    >
                       {Files.length} {Files.length > 1 ? t("files") : t("file")}
-                    </small>
+                    </Box>
                   </>
                 )}
-              </div>
+              </Box>
             </div>
 
-            <div className={classes.actionsContainer}>
+            <Box sx={{ marginBottom: "16px" }}>
               <div>
                 <Button
                   disabled={isCheckingFile || Files.length === 0}
                   variant="contained"
                   onClick={checkFiles}
-                  className={`${classes.nextButton} nextBtnHs submitFileDec`}
+                  className="nextBtnHs submitFileDec"
+                  sx={{
+                    marginTop: "8px",
+                    marginRight: "8px",
+                    borderRadius: "8px",
+                    backgroundColor: "#464653",
+                    color: "#ffffff",
+                    "&:hover": {
+                      backgroundColor: "#3f3f3f",
+                    },
+                    transition: "color .01s",
+                  }}
                   startIcon={
                     isCheckingFile && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
+                      <CircularProgress size={24} />
                     )
                   }
                   fullWidth
@@ -980,10 +934,16 @@ export default function DecryptionPanel() {
                   {t("file_mixup")}
                 </Alert>
               )}
-            </div>
+            </Box>
 
             {!badFile && !oldVersion && !fileMixUp && (
-              <Typography className={classes.offline}>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  float: "right",
+                  color: "rgba(0, 0, 0, 0.54)",
+                }}
+              >
                 {t("offline_note")}
               </Typography>
             )}
@@ -993,10 +953,13 @@ export default function DecryptionPanel() {
         <Step key={2}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
+              sx: {
+                "&.Mui-active": {
+                  color: "#525252",
+                },
+                "&.Mui-completed": {
+                  color: "#525252",
+                },
               },
             }}
           >
@@ -1056,7 +1019,7 @@ export default function DecryptionPanel() {
                       <>
                         <input
                           accept=".public"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="dec-public-key-file"
                           type="file"
                           onChange={(e) => loadPublicKey(e.target.files[0])}
@@ -1114,7 +1077,7 @@ export default function DecryptionPanel() {
 
                         <input
                           accept=".private"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="dec-private-key-file"
                           type="file"
                           onChange={(e) => loadPrivateKey(e.target.files[0])}
@@ -1139,7 +1102,7 @@ export default function DecryptionPanel() {
               </>
             )}
 
-            <div className={classes.actionsContainer}>
+            <Box sx={{ marginBottom: "16px" }}>
               <div>
                 <Grid container spacing={1}>
                   <Grid item>
@@ -1148,7 +1111,12 @@ export default function DecryptionPanel() {
                         activeStep === 0 || isTestingPassword || isTestingKeys
                       }
                       onClick={handleBack}
-                      className={classes.backButton}
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#e9e9e9",
+                      }}
                       fullWidth
                     >
                       {t("back")}
@@ -1165,13 +1133,21 @@ export default function DecryptionPanel() {
                       }
                       variant="contained"
                       onClick={testFilesDecryption}
-                      className={`${classes.nextButton} nextBtnHs submitKeysDec`}
+                      className="nextBtnHs submitKeysDec"
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#464653",
+                        color: "#ffffff",
+                        "&:hover": {
+                          backgroundColor: "#3f3f3f",
+                        },
+                        transition: "color .01s",
+                      }}
                       startIcon={
                         (isTestingPassword || isTestingKeys) && (
-                          <CircularProgress
-                            size={24}
-                            className={classes.buttonProgress}
-                          />
+                          <CircularProgress size={24} />
                         )
                       }
                       fullWidth
@@ -1218,17 +1194,20 @@ export default function DecryptionPanel() {
                     </>
                   )}
               </div>
-            </div>
+            </Box>
           </StepContent>
         </Step>
 
         <Step key={3}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
+              sx: {
+                "&.Mui-active": {
+                  color: "#525252",
+                },
+                "&.Mui-completed": {
+                  color: "#525252",
+                },
               },
             }}
           >
@@ -1247,13 +1226,18 @@ export default function DecryptionPanel() {
               </Alert>
             )}
 
-            <div className={classes.actionsContainer}>
+            <Box sx={{ marginBottom: "16px" }}>
               <Grid container spacing={1}>
                 <Grid item>
                   <Button
                     disabled={activeStep === 0 || isDownloading}
                     onClick={handleBack}
-                    className={classes.backButton}
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#e9e9e9",
+                    }}
                   >
                     {t("back")}
                   </Button>
@@ -1267,13 +1251,21 @@ export default function DecryptionPanel() {
                     }
                     variant="contained"
                     color="primary"
-                    className={`${classes.nextButton} nextBtnHs`}
+                    className="nextBtnHs"
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#464653",
+                      color: "#ffffff",
+                      "&:hover": {
+                        backgroundColor: "#3f3f3f",
+                      },
+                      transition: "color .01s",
+                    }}
                     startIcon={
                       isDownloading ? (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
+                        <CircularProgress size={24} />
                       ) : (
                         <GetAppIcon />
                       )
@@ -1304,12 +1296,19 @@ export default function DecryptionPanel() {
                   {t("page_close_alert")}
                 </Alert>
               )}
-            </div>
+            </Box>
           </StepContent>
         </Step>
       </Stepper>
       {activeStep === 3 && (
-        <Paper elevation={1} className={classes.resetContainer}>
+        <Paper
+          elevation={1}
+          sx={{
+            padding: "24px",
+            boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
+            borderRadius: "8px",
+          }}
+        >
           <Alert
             variant="outlined"
             severity="success"
@@ -1321,7 +1320,18 @@ export default function DecryptionPanel() {
 
           <Button
             onClick={handleReset}
-            className={classes.button}
+            sx={{
+              marginTop: "8px",
+              marginRight: "8px",
+              borderRadius: "8px",
+              border: "none",
+              color: "#3f3f3f",
+              backgroundColor: "#f3f3f3",
+              "&:hover": {
+                backgroundColor: "#e9e9e9",
+              },
+              transition: "background-color 0.2s ease-out",
+            }}
             variant="outlined"
             startIcon={<RefreshIcon />}
             fullWidth
@@ -1331,6 +1341,6 @@ export default function DecryptionPanel() {
           </Button>
         </Paper>
       )}
-    </div>
+    </Box>
   );
 }

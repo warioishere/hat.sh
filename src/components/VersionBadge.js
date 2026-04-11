@@ -1,22 +1,20 @@
 import { currentVersion } from "../config/Constants";
-import { makeStyles } from "@material-ui/core/styles";
-import Chip from "@material-ui/core/Chip";
-
-const useStyles = makeStyles((theme) => ({
-  chip: {
-    backgroundColor: theme.palette.gallery.main,
-    color: theme.palette.mountainMist.main,
-    borderRadius: ".25rem",
-    padding: "none",
-    marginLeft: 15,
-    marginBottom: 10,
-  },
-}));
+import Chip from "@mui/material/Chip";
 
 const VersionBadge = () => {
-  const classes = useStyles();
   return (
-    <Chip className={classes.chip} label={"v" + currentVersion} size="small" />
+    <Chip
+      label={"v" + currentVersion}
+      size="small"
+      sx={{
+        backgroundColor: "gallery.main",
+        color: "mountainMist.main",
+        borderRadius: ".25rem",
+        padding: "none",
+        ml: "15px",
+        mb: "10px",
+      }}
+    />
   );
 };
 

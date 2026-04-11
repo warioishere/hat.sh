@@ -1,25 +1,13 @@
 import { useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogActions from "@material-ui/core/DialogActions";
-import Button from "@material-ui/core/Button";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import { Alert, AlertTitle } from "@mui/material";
 import { getTranslations as t } from "../../locales";
 
-const useStyles = makeStyles((theme) => ({
-  topScrollPaper: {
-    alignItems: "start",
-    marginTop: "20vh",
-  },
-  topPaperScrollBody: {
-    verticalAlign: "middle",
-  },
-}));
-
 const CheckMultipleTabs = () => {
-  const classes = useStyles();
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
@@ -59,16 +47,19 @@ const CheckMultipleTabs = () => {
       PaperProps={{
         elevation: 0,
       }}
-      classes={{
-        scrollPaper: classes.topScrollPaper,
-        paperScrollBody: classes.topPaperScrollBody,
+      sx={{
+        "& .MuiDialog-scrollPaper": {
+          alignItems: "start",
+          marginTop: "20vh",
+        },
       }}
     >
-     
       <DialogContent>
         <DialogContentText>
-          <Alert severity="warning" style={{fontSize: 16}}>
-            <AlertTitle style={{fontSize: 20, marginBottom: 15,}}>{t("multiple_tabs_alert")}</AlertTitle>
+          <Alert severity="warning" style={{ fontSize: 16 }}>
+            <AlertTitle style={{ fontSize: 20, marginBottom: 15 }}>
+              {t("multiple_tabs_alert")}
+            </AlertTitle>
             {t("multiple_tabs_alert_notice_one")}
             <br />
             {t("multiple_tabs_alert_notice_two")}

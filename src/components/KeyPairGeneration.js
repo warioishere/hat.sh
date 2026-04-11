@@ -1,74 +1,67 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Alert from "@material-ui/lab/Alert";
-import { AlertTitle } from "@material-ui/lab";
-import IconButton from "@material-ui/core/IconButton";
-import Collapse from "@material-ui/core/Collapse";
-import Button from "@material-ui/core/Button";
-import CloseIcon from "@material-ui/icons/Close";
-import { Typography } from "@material-ui/core";
-import { Paper, Grid, Tooltip } from "@material-ui/core";
-import CachedIcon from "@material-ui/icons/Cached";
-import { TextField } from "@material-ui/core";
-import GetAppIcon from "@material-ui/icons/GetApp";
+import Alert from "@mui/material/Alert";
+import { AlertTitle } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import Collapse from "@mui/material/Collapse";
+import Button from "@mui/material/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import { Typography, Box } from "@mui/material";
+import { Paper, Grid, Tooltip } from "@mui/material";
+import CachedIcon from "@mui/icons-material/Cached";
+import { TextField } from "@mui/material";
+import GetAppIcon from "@mui/icons-material/GetApp";
 import { generateAsymmetricKeys } from "../utils/generateAsymmetricKeys";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import Hidden from '@material-ui/core/Hidden';
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { getTranslations as t } from "../../locales";
 import QuickResponseCode from "./QuickResponseCode";
 
-const useStyles = makeStyles((theme) => ({
+const styles = {
   root: {
-    marginTop: 50,
+    mt: "50px",
     width: "100%",
-    "& > * + *": {
-      marginTop: theme.spacing(2),
-    },
+    "& > * + *": { mt: 2 },
   },
   generateNowText: {
     float: "right",
-    color: theme.palette.mountainMist.main,
+    color: "mountainMist.main",
     cursor: "pointer",
     textDecoration: "underline",
-    marginLeft: 4,
+    ml: "4px",
   },
   caption: {
     float: "right",
-    color: theme.palette.mountainMist.main,
+    color: "mountainMist.main",
   },
   keyCaption: {
     float: "left",
-    color: theme.palette.mountainMist.main,
-    marginLeft: 4,
+    color: "mountainMist.main",
+    ml: "4px",
     "&:hover": {
       cursor: "pointer",
       textDecoration: "underline",
     },
   },
   button: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    mt: 1,
+    mr: 1,
     borderRadius: "8px",
     border: "none",
-    color: theme.palette.denim.main,
-    backgroundColor: theme.palette.hawkesBlue.light,
-    "&:hover": {
-      backgroundColor: theme.palette.hawkesBlue.main,
-    },
+    color: "#1976d2",
+    backgroundColor: "#e3f2fd",
+    "&:hover": { backgroundColor: "#d0e5f5" },
     transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
+    textTransform: "none",
   },
   alertContainer: {
-    padding: theme.spacing(3),
+    p: 3,
     boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
     borderRadius: "8px",
   },
-}));
+};
 
 const KeysGeneration = (props) => {
-  const classes = useStyles();
   const [open, setOpen] = useState(false);
 
   const [PublicKey, setPublicKey] = useState();
@@ -78,7 +71,6 @@ const KeysGeneration = (props) => {
   );
 
   const [showPrivateKey, setShowPrivateKey] = useState(false);
-
 
   const generateKeys = async () => {
     let generated = await generateAsymmetricKeys();
@@ -105,34 +97,34 @@ const KeysGeneration = (props) => {
 
   return (
     <>
-    {!props.opened &&
-      <div>
-        <Typography
-          variant="caption"
-          className={classes.generateNowText}
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          {t("generate_now_button")}
-        </Typography>
+      {!props.opened && (
+        <div>
+          <Typography
+            variant="caption"
+            sx={styles.generateNowText}
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            {t("generate_now_button")}
+          </Typography>
 
-        <Typography variant="caption" className={classes.caption}>
-          {t("key_pair_question")}
-        </Typography>
+          <Typography variant="caption" sx={styles.caption}>
+            {t("key_pair_question")}
+          </Typography>
 
-        <Hidden xsDown>
-          <a href="/about/#why-need-private-key" target="_blank">
-            <Typography variant="caption" className={classes.keyCaption}>
-              {t('why_need_private_key')}
-            </Typography>
-          </a>
-        </Hidden>
-      </div>
-    }
-      <div className={classes.root}>
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <a href="/about/#why-need-private-key" target="_blank">
+              <Typography variant="caption" sx={styles.keyCaption}>
+                {t("why_need_private_key")}
+              </Typography>
+            </a>
+          </Box>
+        </div>
+      )}
+      <Box sx={styles.root}>
         <Collapse in={open || props.opened}>
-          <Paper elevation={0} className={classes.alertContainer}>
+          <Paper elevation={0} sx={styles.alertContainer}>
             <Alert
               variant="outlined"
               severity="info"
@@ -204,11 +196,7 @@ const KeysGeneration = (props) => {
                           <IconButton
                             onClick={() => setShowPrivateKey(!showPrivateKey)}
                           >
-                            {showPrivateKey ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
+                            {showPrivateKey ? <Visibility /> : <VisibilityOff />}
                           </IconButton>
                         </Tooltip>
 
@@ -236,11 +224,11 @@ const KeysGeneration = (props) => {
               <Grid item xs={12} sm={6}>
                 <Button
                   onClick={generateKeys}
-                  className={`${classes.button} keyPairGenerateBtn`}
+                  className="keyPairGenerateBtn"
                   variant="outlined"
                   startIcon={PrivateKey && <CachedIcon />}
                   fullWidth
-                  style={{ textTransform: "none" }}
+                  sx={styles.button}
                 >
                   {generateBtnText}
                 </Button>
@@ -248,7 +236,7 @@ const KeysGeneration = (props) => {
             </Grid>
           </Paper>
         </Collapse>
-      </div>
+      </Box>
     </>
   );
 };

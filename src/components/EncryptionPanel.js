@@ -8,200 +8,47 @@ import { generatePassword } from "../utils/generatePassword";
 import { computePublicKey } from "../utils/computePublicKey";
 import passwordStrengthCheck from "../utils/passwordStrengthCheck";
 import { CHUNK_SIZE } from "../config/Constants";
-import { makeStyles } from "@material-ui/core/styles";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import Grid from "@material-ui/core/Grid";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Backdrop from "@material-ui/core/Backdrop";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import IconButton from "@material-ui/core/IconButton";
-import CachedIcon from "@material-ui/icons/Cached";
-import Tooltip from "@material-ui/core/Tooltip";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import Snackbar from "@material-ui/core/Snackbar";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import DescriptionIcon from "@material-ui/icons/Description";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import LinkIcon from "@material-ui/icons/Link";
-import Collapse from "@material-ui/core/Collapse";
-import CloseIcon from "@material-ui/icons/Close";
-import AddIcon from "@material-ui/icons/Add";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import { Alert, AlertTitle } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
+import Backdrop from "@mui/material/Backdrop";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import IconButton from "@mui/material/IconButton";
+import CachedIcon from "@mui/icons-material/Cached";
+import Tooltip from "@mui/material/Tooltip";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import Snackbar from "@mui/material/Snackbar";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DescriptionIcon from "@mui/icons-material/Description";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import LinkIcon from "@mui/icons-material/Link";
+import Collapse from "@mui/material/Collapse";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import { getTranslations as t } from "../../locales";
 import {
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-  },
-  offline: {
-    fontSize: 12,
-    float: "right",
-    color: theme.palette.diamondBlack.main,
-  },
-  stepper: {
-    color: theme.palette.mineShaft.main,
-    backgroundColor: "transparent",
-  },
-
-  stepIcon: {
-    "&$activeStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-    "&$completedStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-  },
-  activeStepIcon: {},
-  completedStepIcon: {},
-
-  button: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.mercury.light,
-    "&:hover": {
-      backgroundColor: theme.palette.mercury.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  browseButton: {
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.alto.light,
-    "&:hover": {
-      backgroundColor: theme.palette.alto.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  resetButton: {
-    marginLeft: 8,
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.flower.text,
-    backgroundColor: theme.palette.flower.main,
-    "&:hover": {
-      backgroundColor: theme.palette.flower.light,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  backButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.mercury.main,
-    transition: "color .01s",
-  },
-  nextButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.white.main,
-    "&:hover": {
-      backgroundColor: theme.palette.mineShaft.main,
-    },
-    transition: "color .01s",
-  },
-  actionsContainer: {
-    marginBottom: theme.spacing(2),
-  },
-  resetContainer: {
-    padding: theme.spacing(3),
-    boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
-    borderRadius: "8px",
-  },
-
-  input: {
-    display: "none",
-  },
-
-  fileArea: {
-    padding: "20px",
-    border: "5px dashed",
-    borderColor: theme.palette.gallery.main,
-    borderRadius: "14px",
-    marginBottom: "10px",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-  },
-
-  filesInfo: {
-    float: "right",
-    marginTop: 15,
-    textTransform: "none",
-    color: theme.palette.cottonBoll.text,
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  filesPaper: {
-    marginBottom: 15,
-    overflow: "auto",
-    maxHeight: "280px",
-    backgroundColor: "transparent",
-  },
-
-  filesList: {
-    display: "flex",
-    flex: "1",
-    flexWrap: "wrap",
-    alignContent: "center",
-    justifyContent: "center",
-  },
-
-  filesListItem: {
-    backgroundColor: "#f3f3f3",
-    borderRadius: "8px",
-    padding: 15,
-  },
-
-  filesListItemText: {
-    width: "100px",
-    maxWidth: "150px",
-    minHeight: "50px",
-    maxHeight: "50px",
-  },
-}));
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 let file,
   files = [],
@@ -214,8 +61,6 @@ let file,
   publicKey;
 
 export default function EncryptionPanel() {
-  const classes = useStyles();
-
   const router = useRouter();
 
   const query = router.query;
@@ -456,8 +301,31 @@ export default function EncryptionPanel() {
   const kickOffEncryption = async () => {
     if (currFile <= numberOfFiles - 1) {
       file = files[currFile];
-      window.open(`file`, "_self");
       setIsDownloading(true);
+
+      // Trigger download via fetch + blob for reliable cross-browser support
+      fetch("file").then((response) => {
+        const reader = response.body.getReader();
+        const chunks = [];
+        const pump = () =>
+          reader.read().then(({ done, value }) => {
+            if (done) {
+              const blob = new Blob(chunks);
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = decodeURIComponent(files[currFile].name + ".enc");
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              return;
+            }
+            chunks.push(value);
+            return pump();
+          });
+        pump();
+      });
 
       if (encryptionMethodState === "publicKey") {
         navigator.serviceWorker.ready.then((reg) => {
@@ -615,8 +483,17 @@ export default function EncryptionPanel() {
     });
   }, []);
 
+  const stepIconSx = {
+    "&.Mui-active": {
+      color: "#525252",
+    },
+    "&.Mui-completed": {
+      color: "#525252",
+    },
+  };
+
   return (
-    <div className={classes.root} {...getRootProps()}>
+    <div style={{ width: "100%" }} {...getRootProps()}>
       <Snackbar
         anchorOrigin={{
           vertical: "bottom",
@@ -670,16 +547,15 @@ export default function EncryptionPanel() {
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
-        className={classes.stepper}
+        sx={{
+          color: "#3f3f3f",
+          backgroundColor: "transparent",
+        }}
       >
         <Step key={1}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("choose_files_enc")}
@@ -687,20 +563,55 @@ export default function EncryptionPanel() {
           <StepContent>
             <div className="wrapper p-3" id="encFileWrapper">
               <div
-                className={classes.fileArea}
                 id="encFileArea"
-                style={{ display: Files.length > 0 ? "" : "flex" }}
+                style={{
+                  padding: "20px",
+                  border: "5px dashed",
+                  borderColor: "#ebebeb",
+                  borderRadius: "14px",
+                  marginBottom: "10px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  display: Files.length > 0 ? "" : "flex",
+                }}
               >
-                <Paper elevation={0} className={classes.filesPaper}>
-                  <List dense={true} className={classes.filesList}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    marginBottom: "15px",
+                    overflow: "auto",
+                    maxHeight: "280px",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  <List
+                    dense={true}
+                    sx={{
+                      display: "flex",
+                      flex: "1",
+                      flexWrap: "wrap",
+                      alignContent: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     {Files.length > 0
                       ? Files.map((file, index) => (
                           <ListItem
                             key={index}
-                            className={classes.filesListItem}
+                            sx={{
+                              backgroundColor: "#f3f3f3",
+                              borderRadius: "8px",
+                              padding: "15px",
+                            }}
                           >
                             <ListItemText
-                              className={classes.filesListItemText}
+                              sx={{
+                                width: "100px",
+                                maxWidth: "150px",
+                                minHeight: "50px",
+                                maxHeight: "50px",
+                              }}
                               primary={file.name}
                               secondary={formatBytes(file.size)}
                             />
@@ -722,7 +633,7 @@ export default function EncryptionPanel() {
 
                 <input
                   {...getInputProps()}
-                  className={classes.input}
+                  style={{ display: "none" }}
                   id="enc-file"
                   type="file"
                   onChange={(e) => handleFilesInput(e.target.files)}
@@ -730,7 +641,20 @@ export default function EncryptionPanel() {
                 />
                 <label htmlFor="enc-file">
                   <Button
-                    className={classes.browseButton}
+                    sx={{
+                      padding: "8px",
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#ebebeb",
+                      "&:hover": {
+                        backgroundColor: "#e1e1e1",
+                      },
+                      transition: "color .01s",
+                    }}
                     component="span"
                     startIcon={
                       Files.length > 0 ? <AddIcon /> : <DescriptionIcon />
@@ -744,14 +668,36 @@ export default function EncryptionPanel() {
                   <>
                     <Button
                       onClick={() => resetFilesInput()}
-                      className={classes.resetButton}
+                      sx={{
+                        marginLeft: "8px",
+                        padding: "8px",
+                        paddingLeft: "15px",
+                        paddingRight: "15px",
+                        textTransform: "none",
+                        borderRadius: "8px",
+                        border: "none",
+                        color: "#611a15",
+                        backgroundColor: "#fdecea",
+                        "&:hover": {
+                          backgroundColor: "#fadbd7",
+                        },
+                        transition: "color .01s",
+                      }}
                       component="span"
                       startIcon={<RotateLeftIcon />}
                     >
                       {t("reset")}
                     </Button>
 
-                    <small className={classes.filesInfo}>
+                    <small
+                      style={{
+                        float: "right",
+                        marginTop: 15,
+                        textTransform: "none",
+                        color: "#0d3c61",
+                        transition: "color .01s",
+                      }}
+                    >
                       {Files.length} {Files.length > 1 ? t("files") : t("file")}
                       {Files.length > 1 && <>, {formatBytes(sumFilesSizes)}</>}
                     </small>
@@ -760,21 +706,38 @@ export default function EncryptionPanel() {
               </div>
             </div>
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <div>
                 <Button
                   fullWidth
                   disabled={Files.length === 0}
                   variant="contained"
                   onClick={handleNext}
-                  className={`${classes.nextButton} nextBtnHs submitFile`}
+                  className="nextBtnHs submitFile"
+                  sx={{
+                    marginTop: "8px",
+                    marginRight: "8px",
+                    borderRadius: "8px",
+                    backgroundColor: "#464653",
+                    color: "#ffffff",
+                    "&:hover": {
+                      backgroundColor: "#3f3f3f",
+                    },
+                    transition: "color .01s",
+                  }}
                 >
                   {t("next")}
                 </Button>
               </div>
             </div>
 
-            <Typography className={classes.offline}>
+            <Typography
+              sx={{
+                fontSize: 12,
+                float: "right",
+                color: "rgba(0, 0, 0, 0.54)",
+              }}
+            >
               {t("offline_note")}
             </Typography>
           </StepContent>
@@ -783,11 +746,7 @@ export default function EncryptionPanel() {
         <Step key={2}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {encryptionMethod === "secretKey"
@@ -901,7 +860,7 @@ export default function EncryptionPanel() {
                       <>
                         <input
                           accept=".public"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="public-key-file"
                           type="file"
                           onChange={(e) => loadPublicKey(e.target.files[0])}
@@ -961,7 +920,7 @@ export default function EncryptionPanel() {
 
                         <input
                           accept=".private"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="private-key-file"
                           type="file"
                           onChange={(e) => loadPrivateKey(e.target.files[0])}
@@ -988,14 +947,20 @@ export default function EncryptionPanel() {
               </>
             )}
 
-            <div className={classes.actionsContainer} style={{ marginTop: 15 }}>
+            <div style={{ marginBottom: "16px", marginTop: 15 }}>
               <div>
                 <Grid container spacing={1}>
                   <Grid item>
                     <Button
                       disabled={activeStep === 0}
                       onClick={handleBack}
-                      className={classes.backButton}
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#e9e9e9",
+                        transition: "color .01s",
+                      }}
                       fullWidth
                     >
                       {t("back")}
@@ -1010,7 +975,18 @@ export default function EncryptionPanel() {
                       }
                       variant="contained"
                       onClick={handleMethodStep}
-                      className={`${classes.nextButton} nextBtnHs submitKeys`}
+                      className="nextBtnHs submitKeys"
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#464653",
+                        color: "#ffffff",
+                        "&:hover": {
+                          backgroundColor: "#3f3f3f",
+                        },
+                        transition: "color .01s",
+                      }}
                       fullWidth
                     >
                       {t("next")}
@@ -1034,11 +1010,7 @@ export default function EncryptionPanel() {
         <Step key={3}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("download_encrypted_files")}
@@ -1055,13 +1027,19 @@ export default function EncryptionPanel() {
               </Alert>
             )}
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <Grid container spacing={1}>
                 <Grid item>
                   <Button
                     disabled={activeStep === 0 || isDownloading}
                     onClick={handleBack}
-                    className={classes.backButton}
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#e9e9e9",
+                      transition: "color .01s",
+                    }}
                   >
                     {t("back")}
                   </Button>
@@ -1074,13 +1052,21 @@ export default function EncryptionPanel() {
                       Files.length === 0
                     }
                     variant="contained"
-                    className={`${classes.nextButton} nextBtnHs`}
+                    className="nextBtnHs"
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#464653",
+                      color: "#ffffff",
+                      "&:hover": {
+                        backgroundColor: "#3f3f3f",
+                      },
+                      transition: "color .01s",
+                    }}
                     startIcon={
                       isDownloading ? (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
+                        <CircularProgress size={24} />
                       ) : (
                         <GetAppIcon />
                       )
@@ -1116,7 +1102,14 @@ export default function EncryptionPanel() {
         </Step>
       </Stepper>
       {activeStep === 3 && (
-        <Paper elevation={0} className={classes.resetContainer}>
+        <Paper
+          elevation={0}
+          sx={{
+            padding: "24px",
+            boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
+            borderRadius: "8px",
+          }}
+        >
           <Alert
             variant="outlined"
             severity="success"
@@ -1145,11 +1138,23 @@ export default function EncryptionPanel() {
                     setSnackBarMessage(t("password_copied"));
                     showSnackBar();
                   }}
-                  className={`${classes.button} copyPassword`}
+                  className="copyPassword"
                   variant="outlined"
                   startIcon={<FileCopyIcon />}
                   fullWidth
-                  style={{ textTransform: "none" }}
+                  sx={{
+                    marginTop: "8px",
+                    marginRight: "8px",
+                    borderRadius: "8px",
+                    border: "none",
+                    color: "#3f3f3f",
+                    backgroundColor: "#f3f3f3",
+                    "&:hover": {
+                      backgroundColor: "#e9e9e9",
+                    },
+                    transition: "color .01s",
+                    textTransform: "none",
+                  }}
                 >
                   {t("copy_password")}
                 </Button>
@@ -1164,11 +1169,22 @@ export default function EncryptionPanel() {
                 >
                   <Button
                     onClick={() => createShareableLink()}
-                    className={classes.button}
                     variant="outlined"
                     startIcon={<LinkIcon />}
                     fullWidth
-                    style={{ textTransform: "none" }}
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#f3f3f3",
+                      "&:hover": {
+                        backgroundColor: "#e9e9e9",
+                      },
+                      transition: "color .01s",
+                      textTransform: "none",
+                    }}
                   >
                     {t("create_shareable_link")}
                   </Button>
@@ -1179,11 +1195,22 @@ export default function EncryptionPanel() {
             <Grid item xs={12} sm={6}>
               <Button
                 onClick={handleReset}
-                className={classes.button}
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 fullWidth
-                style={{ textTransform: "none" }}
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  border: "none",
+                  color: "#3f3f3f",
+                  backgroundColor: "#f3f3f3",
+                  "&:hover": {
+                    backgroundColor: "#e9e9e9",
+                  },
+                  transition: "color .01s",
+                  textTransform: "none",
+                }}
               >
                 {t("encrypt_more_files")}
               </Button>
@@ -1197,11 +1224,6 @@ export default function EncryptionPanel() {
                 }
                 InputProps={{
                   readOnly: true,
-                  classes: {
-                    root: classes.textFieldRoot,
-                    focused: classes.textFieldFocused,
-                    notchedOutline: classes.textFieldNotchedOutline,
-                  },
                   endAdornment: (
                     <>
                       <Tooltip title={t("copy_link")} placement="left">

@@ -12,146 +12,57 @@ import {
 } from "../../config/Constants";
 import { formatBytes } from "../../helpers/formatBytes";
 import { computePublicKey } from "../../utils/computePublicKey";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import Tooltip from "@material-ui/core/Tooltip";
-import Backdrop from "@material-ui/core/Backdrop";
-import IconButton from "@material-ui/core/IconButton";
-import Snackbar from "@material-ui/core/Snackbar";
-import FileCopyIcon from "@material-ui/icons/FileCopy";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import DescriptionIcon from "@material-ui/icons/Description";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import CachedIcon from "@material-ui/icons/Cached";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import LinkIcon from "@material-ui/icons/Link";
-import Collapse from "@material-ui/core/Collapse";
-import CloseIcon from "@material-ui/icons/Close";
+import { Alert, AlertTitle } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import Tooltip from "@mui/material/Tooltip";
+import Backdrop from "@mui/material/Backdrop";
+import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import DescriptionIcon from "@mui/icons-material/Description";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import CachedIcon from "@mui/icons-material/Cached";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import LinkIcon from "@mui/icons-material/Link";
+import Collapse from "@mui/material/Collapse";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import { getTranslations as t } from "../../../locales";
 
-const _sodium = require("libsodium-wrappers");
+const _sodium = require("libsodium-wrappers-sumo");
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
+const stepIconSx = {
+  "&.Mui-active": {
+    color: "#525252",
   },
-  offline: {
-    fontSize: 12,
-    float: "right",
-    color: theme.palette.diamondBlack.main,
+  "&.Mui-completed": {
+    color: "#525252",
   },
-  stepper: {
-    backgroundColor: "transparent",
-  },
-  stepIcon: {
-    "&$activeStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-    "&$completedStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-  },
-  activeStepIcon: {},
-  completedStepIcon: {},
-
-  button: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.mercury.light,
-    "&:hover": {
-      backgroundColor: theme.palette.mercury.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  browseButton: {
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.alto.light,
-    "&:hover": {
-      backgroundColor: theme.palette.alto.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  backButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.mercury.main,
-    transition: "color .01s",
-  },
-  nextButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.white.main,
-    "&:hover": {
-      backgroundColor: theme.palette.mineShaft.main,
-    },
-    transition: "color .01s",
-  },
-  actionsContainer: {
-    marginBottom: theme.spacing(2),
-  },
-  resetContainer: {
-    padding: theme.spacing(3),
-    boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
-    borderRadius: "8px",
-  },
-
-  input: {
-    display: "none",
-  },
-
-  fileArea: {
-    padding: "20px",
-    border: "5px dashed",
-    borderColor: theme.palette.gallery.main,
-    borderRadius: "14px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-    marginBottom: "10px",
-  },
-}));
+};
 
 let file,
   limitedIndex,
@@ -164,8 +75,6 @@ let file,
   encTx;
 
 const LimitedEncryptionPanel = () => {
-  const classes = useStyles();
-
   const router = useRouter();
 
   const query = router.query;
@@ -548,7 +457,7 @@ const LimitedEncryptionPanel = () => {
   }, [query.publicKey, query.tab]);
 
   return (
-    <div className={classes.root} {...getRootProps()}>
+    <div style={{ width: "100%" }} {...getRootProps()}>
       <Snackbar
         anchorOrigin={{
           vertical: "bottom",
@@ -602,23 +511,32 @@ const LimitedEncryptionPanel = () => {
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
-        className={classes.stepper}
+        sx={{ backgroundColor: "transparent" }}
       >
         <Step key={1}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("choose_file_enc")}
           </StepLabel>
           <StepContent>
             <div className="wrapper p-3" id="encFileWrapper">
-              <div className={classes.fileArea} id="encFileArea">
+              <div
+                style={{
+                  padding: "20px",
+                  border: "5px dashed",
+                  borderColor: "#ebebeb",
+                  borderRadius: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  marginBottom: "10px",
+                }}
+                id="encFileArea"
+              >
                 <Paper
                   elevation={0}
                   style={{
@@ -674,7 +592,7 @@ const LimitedEncryptionPanel = () => {
 
                 <input
                   {...getInputProps()}
-                  className={classes.input}
+                  style={{ display: "none" }}
                   id="enc-file"
                   type="file"
                   onChange={(e) => handleLimitedFileInput(e.target.files[0])}
@@ -682,7 +600,20 @@ const LimitedEncryptionPanel = () => {
                 <label htmlFor="enc-file">
                   <br />
                   <Button
-                    className={classes.browseButton}
+                    sx={{
+                      padding: "8px",
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#ebebeb",
+                      "&:hover": {
+                        backgroundColor: "#e1e1e1",
+                      },
+                      transition: "color .01s",
+                    }}
                     component="span"
                     startIcon={<DescriptionIcon />}
                   >
@@ -692,13 +623,24 @@ const LimitedEncryptionPanel = () => {
               </div>
             </div>
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <Button
                 fullWidth
                 disabled={!File || largeFile}
                 variant="contained"
                 onClick={handleNext}
-                className={`${classes.nextButton} nextBtnHs`}
+                className="nextBtnHs"
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  backgroundColor: "#464653",
+                  color: "#ffffff",
+                  "&:hover": {
+                    backgroundColor: "#3f3f3f",
+                  },
+                  transition: "color .01s",
+                }}
               >
                 {t("next")}
               </Button>
@@ -712,7 +654,13 @@ const LimitedEncryptionPanel = () => {
               )}
             </div>
             {!largeFile && (
-              <Typography className={classes.offline}>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  float: "right",
+                  color: "rgba(0, 0, 0, 0.54)",
+                }}
+              >
                 {t("offline_note")}
               </Typography>
             )}
@@ -722,11 +670,7 @@ const LimitedEncryptionPanel = () => {
         <Step key={2}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {encryptionMethod === "secretKey"
@@ -837,7 +781,7 @@ const LimitedEncryptionPanel = () => {
                       <>
                         <input
                           accept=".public"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="public-key-file"
                           type="file"
                           onChange={(e) => loadPublicKey(e.target.files[0])}
@@ -896,7 +840,7 @@ const LimitedEncryptionPanel = () => {
 
                         <input
                           accept=".private"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="private-key-file"
                           type="file"
                           onChange={(e) => loadPrivateKey(e.target.files[0])}
@@ -923,14 +867,20 @@ const LimitedEncryptionPanel = () => {
               </>
             )}
 
-            <div className={classes.actionsContainer} style={{ marginTop: 15 }}>
+            <div style={{ marginBottom: "16px", marginTop: 15 }}>
               <div>
                 <Grid container spacing={1}>
                   <Grid item>
                     <Button
                       disabled={activeStep === 0}
                       onClick={handleBack}
-                      className={classes.backButton}
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#e9e9e9",
+                        transition: "color .01s",
+                      }}
                       fullWidth
                     >
                       {t("back")}
@@ -945,7 +895,18 @@ const LimitedEncryptionPanel = () => {
                       }
                       variant="contained"
                       onClick={handleMethodStep}
-                      className={`${classes.nextButton} nextBtnHs`}
+                      className="nextBtnHs"
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#464653",
+                        color: "#ffffff",
+                        "&:hover": {
+                          backgroundColor: "#3f3f3f",
+                        },
+                        transition: "color .01s",
+                      }}
                       fullWidth
                     >
                       {t("next")}
@@ -969,11 +930,7 @@ const LimitedEncryptionPanel = () => {
         <Step key={3}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("encrypt_file")}
@@ -983,13 +940,19 @@ const LimitedEncryptionPanel = () => {
               <strong>{File ? File.name : ""}</strong> {t("ready_to_download")}
             </Alert>
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <Grid container spacing={1}>
                 <Grid item>
                   <Button
                     disabled={activeStep === 0 || isEncrypting}
                     onClick={handleBack}
-                    className={classes.backButton}
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#e9e9e9",
+                      transition: "color .01s",
+                    }}
                   >
                     {t("back")}
                   </Button>
@@ -1003,13 +966,21 @@ const LimitedEncryptionPanel = () => {
                       !File
                     }
                     variant="contained"
-                    className={`${classes.nextButton} nextBtnHs`}
+                    className="nextBtnHs"
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      backgroundColor: "#464653",
+                      color: "#ffffff",
+                      "&:hover": {
+                        backgroundColor: "#3f3f3f",
+                      },
+                      transition: "color .01s",
+                    }}
                     startIcon={
                       isEncrypting ? (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
+                        <CircularProgress size={24} />
                       ) : (
                         <LockOutlinedIcon />
                       )
@@ -1032,7 +1003,14 @@ const LimitedEncryptionPanel = () => {
         </Step>
       </Stepper>
       {activeStep === 3 && (
-        <Paper elevation={1} className={classes.resetContainer}>
+        <Paper
+          elevation={1}
+          sx={{
+            padding: "24px",
+            boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
+            borderRadius: "8px",
+          }}
+        >
           <Alert
             variant="outlined"
             severity="success"
@@ -1056,11 +1034,22 @@ const LimitedEncryptionPanel = () => {
             <Grid item xs={12} sm={12}>
               <Button
                 onClick={handleEncryptedFileDownload}
-                className={`${classes.nextButton} nextBtnHs`}
+                className="nextBtnHs"
                 variant="contained"
                 startIcon={<GetAppIcon />}
                 fullWidth
-                style={{ textTransform: "none" }}
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  backgroundColor: "#464653",
+                  color: "#ffffff",
+                  "&:hover": {
+                    backgroundColor: "#3f3f3f",
+                  },
+                  transition: "color .01s",
+                  textTransform: "none",
+                }}
               >
                 {t("download_file")}
               </Button>
@@ -1073,10 +1062,21 @@ const LimitedEncryptionPanel = () => {
                     setSnackBarMessage(t("password_copied"));
                     showSnackBar();
                   }}
-                  className={classes.button}
+                  sx={{
+                    marginTop: "8px",
+                    marginRight: "8px",
+                    borderRadius: "8px",
+                    border: "none",
+                    color: "#3f3f3f",
+                    backgroundColor: "#f3f3f3",
+                    "&:hover": {
+                      backgroundColor: "#e9e9e9",
+                    },
+                    transition: "color .01s",
+                    textTransform: "none",
+                  }}
                   startIcon={<FileCopyIcon />}
                   fullWidth
-                  style={{ textTransform: "none" }}
                 >
                   {t("copy_password")}
                 </Button>
@@ -1091,11 +1091,22 @@ const LimitedEncryptionPanel = () => {
                 >
                   <Button
                     onClick={() => createShareableLink()}
-                    className={classes.button}
+                    sx={{
+                      marginTop: "8px",
+                      marginRight: "8px",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#f3f3f3",
+                      "&:hover": {
+                        backgroundColor: "#e9e9e9",
+                      },
+                      transition: "color .01s",
+                      textTransform: "none",
+                    }}
                     variant="outlined"
                     startIcon={<LinkIcon />}
                     fullWidth
-                    style={{ textTransform: "none" }}
                   >
                     {t("create_shareable_link")}
                   </Button>
@@ -1106,10 +1117,21 @@ const LimitedEncryptionPanel = () => {
             <Grid item xs={12} sm={6}>
               <Button
                 onClick={handleReset}
-                className={classes.button}
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  border: "none",
+                  color: "#3f3f3f",
+                  backgroundColor: "#f3f3f3",
+                  "&:hover": {
+                    backgroundColor: "#e9e9e9",
+                  },
+                  transition: "color .01s",
+                  textTransform: "none",
+                }}
                 startIcon={<RefreshIcon />}
                 fullWidth
-                style={{ textTransform: "none" }}
               >
                 {t("encrypt_another_file")}
               </Button>
@@ -1123,11 +1145,6 @@ const LimitedEncryptionPanel = () => {
                 }
                 InputProps={{
                   readOnly: true,
-                  classes: {
-                    root: classes.textFieldRoot,
-                    focused: classes.textFieldFocused,
-                    notchedOutline: classes.textFieldNotchedOutline,
-                  },
                   endAdornment: (
                     <>
                       <Tooltip title={t("copy_link")} placement="left">

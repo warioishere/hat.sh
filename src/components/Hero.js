@@ -1,28 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import Typography from "@material-ui/core/Typography";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
 import { getTranslations as t } from "../../locales";
 
-const useStyles = makeStyles((theme) => ({
-  heroTitle: {
-    color: theme.palette.diamondBlack.main,
-    marginTop: 20,
-  },
-  heroSubTitle: {
-    color: theme.palette.diamondBlack.main,
-  },
-}));
-
 export default function Hero() {
-  const classes = useStyles();
   return (
-    <Container maxWidth="sm" component="main" className={classes.heroContent}>
+    <Container maxWidth="sm" component="main">
       <Typography
         variant="h5"
         align="center"
         gutterBottom
-        className={classes.heroTitle}
+        sx={{ color: "diamondBlack.main", mt: "20px" }}
       >
         {"Hat.sh"}
       </Typography>
@@ -30,9 +18,9 @@ export default function Hero() {
         variant="subtitle1"
         align="center"
         component="p"
-        className={classes.heroSubTitle}
+        sx={{ color: "diamondBlack.main" }}
       >
-        {t('sub_title')}
+        {t("sub_title")}
         <br />
       </Typography>
     </Container>

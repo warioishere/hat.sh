@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-sync-scripts */
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import { getTranslations as t } from "../locales";
 import "../public/assets/styles/style.css";
@@ -8,14 +9,17 @@ import { checkTheme } from "../src/config/Theme";
 checkTheme();
 
 function MyApp({ Component, pageProps }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <>
       <Head>
-        <title>
-          {"Hat.sh"}
-          {" - "}
-          {t("sub_title")}
-        </title>
+        <title>{`Hat.sh - ${t("sub_title")}`}</title>
         <link rel="icon" href="/favicon.ico" />
 
         <meta charSet="utf-8" />

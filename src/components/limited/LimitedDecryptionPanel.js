@@ -11,136 +11,47 @@ import {
   SIGNATURES,
   decoder,
 } from "../../config/Constants";
-import { Alert, AlertTitle } from "@material-ui/lab";
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import StepContent from "@material-ui/core/StepContent";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
-import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import Collapse from "@material-ui/core/Collapse";
-import RefreshIcon from "@material-ui/icons/Refresh";
-import DescriptionIcon from "@material-ui/icons/Description";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import AttachFileIcon from "@material-ui/icons/AttachFile";
-import CloseIcon from "@material-ui/icons/Close";
+import { Alert, AlertTitle } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import StepContent from "@mui/material/StepContent";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Collapse from "@mui/material/Collapse";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DescriptionIcon from "@mui/icons-material/Description";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   List,
   ListItem,
   ListItemSecondaryAction,
   ListItemText,
-} from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { getTranslations as t } from "../../../locales";
 
-const _sodium = require("libsodium-wrappers");
+const _sodium = require("libsodium-wrappers-sumo");
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
+const stepIconSx = {
+  "&.Mui-active": {
+    color: "#525252",
   },
-  offline: {
-    fontSize: 12,
-    float: "right",
-    color: theme.palette.diamondBlack.main,
+  "&.Mui-completed": {
+    color: "#525252",
   },
-  stepper: {
-    backgroundColor: "transparent",
-  },
-  stepIcon: {
-    "&$activeStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-    "&$completedStepIcon": {
-      color: theme.palette.emperor.main,
-    },
-  },
-  activeStepIcon: {},
-  completedStepIcon: {},
-
-  button: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.mercury.light,
-    "&:hover": {
-      backgroundColor: theme.palette.mercury.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  browseButton: {
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    textTransform: "none",
-    borderRadius: "8px",
-    border: "none",
-    color: theme.palette.mineShaft.main,
-    backgroundColor: theme.palette.alto.light,
-    "&:hover": {
-      backgroundColor: theme.palette.alto.main,
-    },
-    transition: "background-color 0.2s ease-out",
-    transition: "color .01s",
-  },
-
-  backButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.mercury.main,
-    transition: "color .01s",
-  },
-  nextButton: {
-    marginTop: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    borderRadius: "8px",
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.white.main,
-    "&:hover": {
-      backgroundColor: theme.palette.mineShaft.main,
-    },
-    transition: "color .01s",
-  },
-  actionsContainer: {
-    marginBottom: theme.spacing(2),
-  },
-  resetContainer: {
-    padding: theme.spacing(3),
-    boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
-    borderRadius: "8px",
-  },
-
-  input: {
-    display: "none",
-  },
-
-  fileArea: {
-    padding: "20px",
-    border: "5px dashed",
-    borderColor: theme.palette.gallery.main,
-    borderRadius: "14px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-    marginBottom: "10px",
-  },
-}));
+};
 
 let file,
   limitedDecIndex,
@@ -150,8 +61,6 @@ let file,
   decTx;
 
 const LimitedDecryptionPanel = () => {
-  const classes = useStyles();
-
   const [activeStep, setActiveStep] = useState(0);
 
   const router = useRouter();
@@ -657,7 +566,7 @@ const LimitedDecryptionPanel = () => {
   }, [query.publicKey, query.tab]);
 
   return (
-    <div className={classes.root} {...getRootProps()}>
+    <div style={{ width: "100%" }} {...getRootProps()}>
       <Backdrop open={isDragActive} style={{ zIndex: 10 }}>
         <Typography
           variant="h2"
@@ -696,23 +605,32 @@ const LimitedDecryptionPanel = () => {
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
-        className={classes.stepper}
+        sx={{ backgroundColor: "transparent" }}
       >
         <Step key={1}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("choose_file_dec")}
           </StepLabel>
           <StepContent>
             <div className="wrapper p-3" id="encFileWrapper">
-              <div className={classes.fileArea} id="encFileArea">
+              <div
+                style={{
+                  padding: "20px",
+                  border: "5px dashed",
+                  borderColor: "#ebebeb",
+                  borderRadius: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  marginBottom: "10px",
+                }}
+                id="encFileArea"
+              >
                 <Paper
                   elevation={0}
                   style={{
@@ -768,7 +686,7 @@ const LimitedDecryptionPanel = () => {
 
                 <input
                   {...getInputProps()}
-                  className={classes.input}
+                  style={{ display: "none" }}
                   id="dec-file"
                   type="file"
                   onChange={(e) => handleLimitedFileInput(e.target.files[0])}
@@ -776,7 +694,20 @@ const LimitedDecryptionPanel = () => {
                 <label htmlFor="dec-file">
                   <br />
                   <Button
-                    className={classes.browseButton}
+                    sx={{
+                      padding: "8px",
+                      paddingLeft: "15px",
+                      paddingRight: "15px",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#3f3f3f",
+                      backgroundColor: "#ebebeb",
+                      "&:hover": {
+                        backgroundColor: "#e1e1e1",
+                      },
+                      transition: "color .01s",
+                    }}
                     component="span"
                     startIcon={<DescriptionIcon />}
                   >
@@ -786,19 +717,27 @@ const LimitedDecryptionPanel = () => {
               </div>
             </div>
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <div>
                 <Button
                   disabled={isCheckingFile || !File}
                   variant="contained"
                   onClick={checkFile}
-                  className={`${classes.nextButton} nextBtnHs`}
+                  className="nextBtnHs"
+                  sx={{
+                    marginTop: "8px",
+                    marginRight: "8px",
+                    borderRadius: "8px",
+                    backgroundColor: "#464653",
+                    color: "#ffffff",
+                    "&:hover": {
+                      backgroundColor: "#3f3f3f",
+                    },
+                    transition: "color .01s",
+                  }}
                   startIcon={
                     isCheckingFile && (
-                      <CircularProgress
-                        size={24}
-                        className={classes.buttonProgress}
-                      />
+                      <CircularProgress size={24} />
                     )
                   }
                   fullWidth
@@ -833,7 +772,13 @@ const LimitedDecryptionPanel = () => {
             </div>
 
             {!badFile && !oldVersion && !largeFile && (
-              <Typography className={classes.offline}>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  float: "right",
+                  color: "rgba(0, 0, 0, 0.54)",
+                }}
+              >
                 {t("offline_note")}
               </Typography>
             )}
@@ -843,11 +788,7 @@ const LimitedDecryptionPanel = () => {
         <Step key={2}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {decryptionMethod === "secretKey"
@@ -904,7 +845,7 @@ const LimitedDecryptionPanel = () => {
                       <>
                         <input
                           accept=".public"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="dec-public-key-file"
                           type="file"
                           onChange={(e) => loadPublicKey(e.target.files[0])}
@@ -961,7 +902,7 @@ const LimitedDecryptionPanel = () => {
 
                         <input
                           accept=".private"
-                          className={classes.input}
+                          style={{ display: "none" }}
                           id="dec-private-key-file"
                           type="file"
                           onChange={(e) => loadPrivateKey(e.target.files[0])}
@@ -986,7 +927,7 @@ const LimitedDecryptionPanel = () => {
               </>
             )}
 
-            <div className={classes.actionsContainer}>
+            <div style={{ marginBottom: "16px" }}>
               <div>
                 <Grid container spacing={1}>
                   <Grid item>
@@ -998,7 +939,13 @@ const LimitedDecryptionPanel = () => {
                         isDecrypting
                       }
                       onClick={handleBack}
-                      className={classes.backButton}
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#e9e9e9",
+                        transition: "color .01s",
+                      }}
                       fullWidth
                     >
                       {t("back")}
@@ -1016,13 +963,21 @@ const LimitedDecryptionPanel = () => {
                       }
                       variant="contained"
                       onClick={testLimitedDecryption}
-                      className={`${classes.nextButton} nextBtnHs`}
+                      className="nextBtnHs"
+                      sx={{
+                        marginTop: "8px",
+                        marginRight: "8px",
+                        borderRadius: "8px",
+                        backgroundColor: "#464653",
+                        color: "#ffffff",
+                        "&:hover": {
+                          backgroundColor: "#3f3f3f",
+                        },
+                        transition: "color .01s",
+                      }}
                       startIcon={
                         (isTestingPassword || isDecrypting) && (
-                          <CircularProgress
-                            size={24}
-                            className={classes.buttonProgress}
-                          />
+                          <CircularProgress size={24} />
                         )
                       }
                       fullWidth
@@ -1056,11 +1011,7 @@ const LimitedDecryptionPanel = () => {
         <Step key={3}>
           <StepLabel
             StepIconProps={{
-              classes: {
-                root: classes.stepIcon,
-                active: classes.activeStepIcon,
-                completed: classes.completedStepIcon,
-              },
+              sx: stepIconSx,
             }}
           >
             {t("download_decrypted_file")}
@@ -1069,7 +1020,14 @@ const LimitedDecryptionPanel = () => {
       </Stepper>
 
       {activeStep === 2 && (
-        <Paper elevation={1} className={classes.resetContainer}>
+        <Paper
+          elevation={1}
+          sx={{
+            padding: "24px",
+            boxShadow: "rgba(149, 157, 165, 0.4) 0px 8px 24px",
+            borderRadius: "8px",
+          }}
+        >
           <Alert
             variant="outlined"
             severity="success"
@@ -1084,11 +1042,22 @@ const LimitedDecryptionPanel = () => {
               <Button
                 onClick={handleDecryptedFileDownload}
                 color="primary"
-                className={`${classes.nextButton} nextBtnHs`}
+                className="nextBtnHs"
                 variant="contained"
                 startIcon={<GetAppIcon />}
                 fullWidth
-                style={{ textTransform: "none" }}
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  backgroundColor: "#464653",
+                  color: "#ffffff",
+                  "&:hover": {
+                    backgroundColor: "#3f3f3f",
+                  },
+                  transition: "color .01s",
+                  textTransform: "none",
+                }}
               >
                 {t("download_file")}
               </Button>
@@ -1096,11 +1065,22 @@ const LimitedDecryptionPanel = () => {
             <Grid item xs={12}>
               <Button
                 onClick={handleReset}
-                className={classes.button}
+                sx={{
+                  marginTop: "8px",
+                  marginRight: "8px",
+                  borderRadius: "8px",
+                  border: "none",
+                  color: "#3f3f3f",
+                  backgroundColor: "#f3f3f3",
+                  "&:hover": {
+                    backgroundColor: "#e9e9e9",
+                  },
+                  transition: "color .01s",
+                  textTransform: "none",
+                }}
                 variant="outlined"
                 startIcon={<RefreshIcon />}
                 fullWidth
-                style={{ textTransform: "none" }}
               >
                 {t("decrypt_another_file")}
               </Button>
