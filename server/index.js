@@ -23,7 +23,18 @@ function generateTurnCredentials() {
 
 const rooms = new Map();
 
-const wss = new WebSocketServer({ port: PORT });
+const http = require("http");
+const server = http.createServer();
+const wss = new WebSocketServer({ noServer: true });
+
+server.on("upgrade", (req, socket, head) => {
+  // Accept connections on any path (/signal, /, etc.)
+  wss.handleUpgrade(req, socket, head, (ws) => {
+    wss.emit("connection", ws, req);
+  });
+});
+
+server.listen(PORT);
 
 console.log(`Signaling server running on port ${PORT}`);
 if (TURN_URL) {
