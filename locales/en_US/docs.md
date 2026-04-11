@@ -34,6 +34,7 @@ The libsodium library is used for all cryptographic algorithms. [Technical detai
 - Asymmetric key pair generation.
 - Authenticated key exchange.
 - Password strength estimation.
+- Peer-to-peer encrypted file transfer via WebRTC.
 
 <br>
 
@@ -228,6 +229,59 @@ hat.sh is also available as a Docker image. You can find it on [Docker Hub].
 3. Drag & Drop or Select the files that you wish to decrypt.
 4. Enter or load sender's public key and your private key.
 5. Download the decrypted file.
+
+<br>
+
+# [P2P Transfer](#p2p-transfer)
+
+---
+
+Hat.sh includes a peer-to-peer file transfer feature that allows you to send files directly from one browser to another, encrypted end-to-end.
+
+<br>
+
+### How it works
+
+Files are transferred directly between browsers using [WebRTC](https://webrtc.org/) Data Channels. No file data ever passes through a server. A small signaling server is only used to establish the initial connection between peers.
+
+<br>
+
+### Sending a file
+
+1. Navigate to the **Transfer** tab.
+2. Select **Send** mode.
+3. Choose a file to transfer.
+4. Enter a password (used for end-to-end encryption).
+5. A 3-word room code is generated (e.g. `tiger-moon-castle`).
+6. Share this code with the recipient.
+7. Once the recipient connects, the transfer starts automatically.
+
+<br>
+
+### Receiving a file
+
+1. Navigate to the **Transfer** tab.
+2. Select **Receive** mode.
+3. Enter the room code provided by the sender.
+4. Enter the same password the sender used.
+5. The file is transferred, decrypted, and downloaded automatically.
+
+<br>
+
+### Security
+
+- **End-to-end encryption**: Files are encrypted with XChaCha20-Poly1305 before being sent over the WebRTC Data Channel. The password is never transmitted.
+- **Key derivation**: The encryption key is derived from the password using Argon2id (same as file encryption).
+- **No server storage**: The signaling server only relays connection metadata (SDP offers/answers, ICE candidates). It never sees the file data or the password.
+- **Direct connection**: Once the WebRTC connection is established, data flows directly between browsers (peer-to-peer). If a direct connection is not possible, a TURN relay server is used, but the data remains encrypted.
+
+<br>
+
+### Requirements
+
+- Both sender and receiver need a modern browser (Chrome, Brave, Firefox, Edge).
+- Both need an internet connection.
+- The signaling server must be reachable.
 
 <br>
 

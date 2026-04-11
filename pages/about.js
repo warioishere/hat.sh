@@ -33,14 +33,17 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import LiveHelpIcon from "@mui/icons-material/LiveHelp";
 import HistoryIcon from "@mui/icons-material/History";
+import SyncAltIcon from "@mui/icons-material/SyncAlt";
 import prism from "prismjs";
 import { markedHighlight } from "marked-highlight";
+import { gfmHeadingId } from "marked-gfm-heading-id";
 import Settings from "../src/components/Settings";
 import { getInitialMode } from "../src/config/Theme";
 import locales from "../locales/locales";
 import { getTranslations as t } from "../locales";
 const drawerWidth = 240;
 
+marked.use(gfmHeadingId());
 marked.use(
   markedHighlight({
     highlight: function (code, lang) {
@@ -253,6 +256,7 @@ export default function About(props) {
           { name: t("features"), anchor: "features", icon: <StarsIcon /> },
           { name: t("installation"), anchor: "installation", icon: <GetAppIcon /> },
           { name: t("usage"), anchor: "usage", icon: <EmojiObjectsIcon /> },
+          { name: "P2P Transfer", anchor: "p2p-transfer", icon: <SyncAltIcon /> },
           { name: t("limitations"), anchor: "limitations", icon: <ErrorOutlineIcon /> },
           { name: t("best_practices"), anchor: "best-practices", icon: <VerifiedUserIcon /> },
           { name: t("faq"), anchor: "faq", icon: <LiveHelpIcon /> },
