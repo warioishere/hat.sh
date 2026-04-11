@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import PropTypes from "prop-types";
 import EncryptionPanel from "./EncryptionPanel";
 import DecryptionPanel from "./DecryptionPanel";
+import TransferPanel from "./TransferPanel";
 import { styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Container from "@mui/material/Container";
@@ -58,6 +59,7 @@ export default function CustomizedTabs() {
   const [value, setValue] = useState(0);
   const encryption = { tab: 0, label: t("encryption") };
   const decryption = { tab: 1, label: t("decryption") };
+  const transfer = { tab: 2, label: "Transfer" };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -72,7 +74,10 @@ export default function CustomizedTabs() {
     if (query.tab && query.tab === "decryption") {
       setValue(decryption.tab);
     }
-  }, [decryption.tab, encryption.tab, query.tab]);
+    if (query.tab && query.tab === "transfer") {
+      setValue(transfer.tab);
+    }
+  }, [decryption.tab, encryption.tab, transfer.tab, query.tab]);
 
   return (
     <>
@@ -95,6 +100,7 @@ export default function CustomizedTabs() {
           >
             <StyledTab label={encryption.label} disableRipple />
             <StyledTab label={decryption.label} disableRipple />
+            <StyledTab label={transfer.label} disableRipple />
           </StyledTabs>
         </AppBar>
 
@@ -103,6 +109,9 @@ export default function CustomizedTabs() {
         </TabPanel>
         <TabPanel value={value} index={decryption.tab} style={{ marginTop: 15 }}>
           <DecryptionPanel />
+        </TabPanel>
+        <TabPanel value={value} index={transfer.tab} style={{ marginTop: 15 }}>
+          <TransferPanel />
         </TabPanel>
       </Container>
     </>
