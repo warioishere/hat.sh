@@ -27,18 +27,17 @@ import { getTranslations as t } from "../../locales";
 
 const _sodium = require("libsodium-wrappers-sumo");
 
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    ...(process.env.NEXT_PUBLIC_TURN_URL
-      ? [{
-          urls: process.env.NEXT_PUBLIC_TURN_URL,
-          username: process.env.NEXT_PUBLIC_TURN_USER || "",
-          credential: process.env.NEXT_PUBLIC_TURN_PASS || "",
-        }]
-      : []),
-  ],
-};
+function buildRtcConfig(turn) {
+  const iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
+  if (turn) {
+    iceServers.push({
+      urls: turn.urls,
+      username: turn.username,
+      credential: turn.credential,
+    });
+  }
+  return { iceServers };
+}
 
 export default function TransferPanel() {
   const [mode, setMode] = useState("send");
@@ -74,6 +73,7 @@ export default function TransferPanel() {
   const pcRef = useRef(null);
   const dcRef = useRef(null);
   const isMountedRef = useRef(true);
+  const turnRef = useRef(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -199,6 +199,7 @@ export default function TransferPanel() {
       switch (msg.type) {
         case "room-created":
           setRoomCode(msg.room);
+          turnRef.current = msg.turn || null;
           break;
 
         case "peer-joined":
@@ -234,7 +235,7 @@ export default function TransferPanel() {
   };
 
   const setupSenderPeerConnection = (ws) => {
-    const pc = new RTCPeerConnection(rtcConfig);
+    const pc = new RTCPeerConnection(buildRtcConfig(turnRef.current));
     pcRef.current = pc;
 
     const dc = pc.createDataChannel("fileTransfer", {
@@ -444,6 +445,7 @@ export default function TransferPanel() {
 
       switch (msg.type) {
         case "joined":
+          turnRef.current = msg.turn || null;
           setupReceiverPeerConnection(ws, receiverState);
           break;
 
@@ -470,7 +472,7 @@ export default function TransferPanel() {
   };
 
   const setupReceiverPeerConnection = (ws, receiverState) => {
-    const pc = new RTCPeerConnection(rtcConfig);
+    const pc = new RTCPeerConnection(buildRtcConfig(turnRef.current));
     pcRef.current = pc;
 
     pc.onicecandidate = (e) => {

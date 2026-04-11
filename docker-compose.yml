@@ -6,10 +6,6 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_TURN_URL=${TURN_URL:-}
-        - NEXT_PUBLIC_TURN_USER=${TURN_USER:-}
-        - NEXT_PUBLIC_TURN_PASS=${TURN_PASS:-}
     ports:
       - 3991:80
     volumes:
@@ -21,4 +17,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8080:8080
+    environment:
+      - TURN_URL=${TURN_URL:-}
+      - TURN_SECRET=${TURN_SECRET:-}
     restart: unless-stopped

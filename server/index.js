@@ -1,14 +1,36 @@
 const { WebSocketServer } = require("ws");
+const crypto = require("crypto");
 const { generateRoomCode } = require("./words");
 
 const PORT = process.env.PORT || 8080;
 const ROOM_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+// TURN server config (shared secret)
+const TURN_URL = process.env.TURN_URL || "";
+const TURN_SECRET = process.env.TURN_SECRET || "";
+const TURN_TTL = 86400; // credentials valid for 24h
+
+function generateTurnCredentials() {
+  if (!TURN_URL || !TURN_SECRET) return null;
+  const timestamp = Math.floor(Date.now() / 1000) + TURN_TTL;
+  const username = timestamp.toString();
+  const credential = crypto
+    .createHmac("sha1", TURN_SECRET)
+    .update(username)
+    .digest("base64");
+  return { urls: TURN_URL, username, credential };
+}
 
 const rooms = new Map();
 
 const wss = new WebSocketServer({ port: PORT });
 
 console.log(`Signaling server running on port ${PORT}`);
+if (TURN_URL) {
+  console.log(`TURN server configured: ${TURN_URL}`);
+} else {
+  console.log("No TURN server configured (STUN only)");
+}
 
 wss.on("connection", (ws) => {
   let currentRoom = null;
@@ -32,7 +54,8 @@ wss.on("connection", (ws) => {
         });
         currentRoom = room;
         role = "sender";
-        ws.send(JSON.stringify({ type: "created", room }));
+        const turn = generateTurnCredentials();
+        ws.send(JSON.stringify({ type: "room-created", room, turn }));
         break;
       }
 
@@ -49,7 +72,8 @@ wss.on("connection", (ws) => {
         roomData.receiver = ws;
         currentRoom = msg.room;
         role = "receiver";
-        ws.send(JSON.stringify({ type: "joined" }));
+        const turn = generateTurnCredentials();
+        ws.send(JSON.stringify({ type: "joined", turn }));
         roomData.sender.send(JSON.stringify({ type: "peer-joined" }));
         break;
       }
@@ -72,7 +96,7 @@ wss.on("connection", (ws) => {
       if (roomData) {
         const other = role === "sender" ? roomData.receiver : roomData.sender;
         if (other && other.readyState === 1) {
-          other.send(JSON.stringify({ type: "peer-left" }));
+          other.send(JSON.stringify({ type: "peer-disconnected" }));
         }
         rooms.delete(currentRoom);
       }
