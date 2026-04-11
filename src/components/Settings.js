@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -9,17 +9,12 @@ import IconButton from "@mui/material/IconButton";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Language from "../config/Language";
 import { DarkMode } from "../config/Theme";
+import { ThemeModeContext } from "../../pages/_app";
 import { getTranslations as t } from "../../locales";
-
-const dialogClasses = {
-  scrollPaper: {
-    alignItems: "start",
-    marginTop: "20vh",
-  },
-};
 
 const Settings = () => {
   const [open, setOpen] = useState(false);
+  const { mode, setMode } = useContext(ThemeModeContext);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -46,7 +41,10 @@ const Settings = () => {
           elevation: 0,
         }}
         sx={{
-          "& .MuiDialog-scrollPaper": dialogClasses.scrollPaper,
+          "& .MuiDialog-scrollPaper": {
+            alignItems: "start",
+            marginTop: "20vh",
+          },
         }}
       >
         <DialogTitle id="alert-dialog-title">{t("settings")}</DialogTitle>
@@ -64,7 +62,7 @@ const Settings = () => {
             {t("change_appearance")} :
           </DialogContentText>
 
-          <DarkMode />
+          <DarkMode mode={mode} setMode={setMode} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary" autoFocus>

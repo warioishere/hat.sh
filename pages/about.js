@@ -36,8 +36,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import prism from "prismjs";
 import { markedHighlight } from "marked-highlight";
 import Settings from "../src/components/Settings";
-import { ThemeProvider } from "@mui/material/styles";
-import { Theme, checkTheme } from "../src/config/Theme";
+import { getInitialMode } from "../src/config/Theme";
 import locales from "../locales/locales";
 import { getTranslations as t } from "../locales";
 const drawerWidth = 240;
@@ -191,10 +190,6 @@ export default function About(props) {
   const [docContent, setDocContent] = useState("");
 
   useEffect(() => {
-    checkTheme();
-  }, []);
-
-  useEffect(() => {
     const getLocale = () => {
       if (typeof window !== "undefined") {
         let language = window.localStorage.getItem("language");
@@ -290,7 +285,7 @@ export default function About(props) {
   );
 
   return (
-    <ThemeProvider theme={Theme}>
+    <>
       <Box
         sx={{
           backgroundColor: "#fafafa",
@@ -407,7 +402,7 @@ export default function About(props) {
 
         <Footer />
       </Box>
-    </ThemeProvider>
+    </>
   );
 }
 

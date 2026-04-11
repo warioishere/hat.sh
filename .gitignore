@@ -34,3 +34,5 @@ yarn-error.log*
 
 # vercel
 .vercel
+test-results/
+e2e/testfile.txt

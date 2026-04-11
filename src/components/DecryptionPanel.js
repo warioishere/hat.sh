@@ -101,6 +101,9 @@ export default function DecryptionPanel() {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const [progress, setProgress] = useState(0);
+  const [processedBytes, setProcessedBytes] = useState(0);
+
   const [pkAlert, setPkAlert] = useState(false);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -147,6 +150,8 @@ export default function DecryptionPanel() {
     files = [];
     numberOfFiles = 0;
     resetCurrFile();
+    setProgress(0);
+    setProcessedBytes(0);
     router.replace(router.pathname);
   };
 
@@ -389,12 +394,19 @@ export default function DecryptionPanel() {
     if (currFile <= numberOfFiles - 1) {
       file = files[currFile];
       setIsDownloading(true);
+      setProgress(0);
+      setProcessedBytes(0);
 
       // Trigger download via fetch + blob for reliable cross-browser support
       const formatName = (await import("../helpers/formatName")).formatName;
+      // Expected decrypted size: input minus headers and auth tags
+      const headerSize = decryptionMethodState === "secretKey" ? 51 : 35;
+      const numChunks = Math.ceil((file.size - headerSize) / (CHUNK_SIZE + 17));
+      const expectedSize = file.size - headerSize - numChunks * 17;
       fetch("file").then((response) => {
         const reader = response.body.getReader();
         const chunks = [];
+        let totalBytes = 0;
         const pump = () =>
           reader.read().then(({ done, value }) => {
             if (done) {
@@ -410,6 +422,9 @@ export default function DecryptionPanel() {
               return;
             }
             chunks.push(value);
+            totalBytes += value.length;
+            setProcessedBytes(totalBytes);
+            setProgress(Math.min(Math.round((totalBytes / expectedSize) * 100), 100));
             return pump();
           });
         pump();
@@ -1251,7 +1266,8 @@ export default function DecryptionPanel() {
                     }
                     variant="contained"
                     color="primary"
-                    className="nextBtnHs"
+                    className="nextBtnHs downloadFileDec"
+                    onClick={(e) => handleEncryptedFilesDownload(e)}
                     sx={{
                       marginTop: "8px",
                       marginRight: "8px",
@@ -1265,27 +1281,20 @@ export default function DecryptionPanel() {
                     }}
                     startIcon={
                       isDownloading ? (
-                        <CircularProgress size={24} />
+                        <CircularProgress
+                          size={24}
+                          variant="determinate"
+                          value={progress}
+                        />
                       ) : (
                         <GetAppIcon />
                       )
                     }
                     fullWidth
                   >
-                    <a
-                      onClick={(e) => handleEncryptedFilesDownload(e)}
-                      className="downloadFileDec"
-                      style={{
-                        width: "100%",
-                        textDecoration: "none",
-                      }}
-                    >
-                      {isDownloading
-                        ? `${currFileState + 1}/${numberOfFiles} ${t(
-                            "downloading_file"
-                          )}`
-                        : t("decrypted_files")}
-                    </a>
+                    {isDownloading
+                      ? `${progress}% (${formatBytes(processedBytes)})`
+                      : t("decrypted_files")}
                   </Button>
                 </Grid>
               </Grid>

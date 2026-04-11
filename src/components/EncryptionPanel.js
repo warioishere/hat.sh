@@ -97,6 +97,9 @@ export default function EncryptionPanel() {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const [progress, setProgress] = useState(0);
+  const [processedBytes, setProcessedBytes] = useState(0);
+
   const [shareableLink, setShareableLink] = useState();
 
   const [snackBarOpen, setSnackBarOpen] = useState(false);
@@ -144,6 +147,8 @@ export default function EncryptionPanel() {
     setKeysError(false);
     setShortPasswordError(false);
     setIsDownloading(false);
+    setProgress(0);
+    setProcessedBytes(0);
     setShareableLink();
     setSnackBarMessage();
     setPkAlert(false);
@@ -302,11 +307,17 @@ export default function EncryptionPanel() {
     if (currFile <= numberOfFiles - 1) {
       file = files[currFile];
       setIsDownloading(true);
+      setProgress(0);
+      setProcessedBytes(0);
 
       // Trigger download via fetch + blob for reliable cross-browser support
+      // Expected encrypted size: signature(11) + salt(16) + header(24) + data + auth tags(17 per chunk)
+      const numChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const expectedSize = 51 + file.size + numChunks * 17;
       fetch("file").then((response) => {
         const reader = response.body.getReader();
         const chunks = [];
+        let totalBytes = 0;
         const pump = () =>
           reader.read().then(({ done, value }) => {
             if (done) {
@@ -322,6 +333,9 @@ export default function EncryptionPanel() {
               return;
             }
             chunks.push(value);
+            totalBytes += value.length;
+            setProcessedBytes(totalBytes);
+            setProgress(Math.min(Math.round((totalBytes / expectedSize) * 100), 100));
             return pump();
           });
         pump();
@@ -1052,7 +1066,8 @@ export default function EncryptionPanel() {
                       Files.length === 0
                     }
                     variant="contained"
-                    className="nextBtnHs"
+                    className="nextBtnHs downloadFile"
+                    onClick={(e) => handleEncryptedFilesDownload(e)}
                     sx={{
                       marginTop: "8px",
                       marginRight: "8px",
@@ -1066,27 +1081,20 @@ export default function EncryptionPanel() {
                     }}
                     startIcon={
                       isDownloading ? (
-                        <CircularProgress size={24} />
+                        <CircularProgress
+                          size={24}
+                          variant="determinate"
+                          value={progress}
+                        />
                       ) : (
                         <GetAppIcon />
                       )
                     }
                     fullWidth
                   >
-                    <a
-                      onClick={(e) => handleEncryptedFilesDownload(e)}
-                      className="downloadFile"
-                      style={{
-                        width: "100%",
-                        textDecoration: "none",
-                      }}
-                    >
-                      {isDownloading
-                        ? `${currFileState + 1}/${numberOfFiles} ${t(
-                            "downloading_file"
-                          )}`
-                        : t("encrypted_files")}
-                    </a>
+                    {isDownloading
+                      ? `${progress}% (${formatBytes(processedBytes)})`
+                      : t("encrypted_files")}
                   </Button>
                 </Grid>
               </Grid>

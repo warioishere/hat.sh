@@ -1,8 +1,27 @@
+const CACHE_NAME = "hatsh-v3";
+const OFFLINE_ASSETS = [
+  "/",
+  "/favicon.ico",
+  "/manifest.json",
+  "/assets/images/logo.png",
+  "/assets/images/logo2.png",
+  "/assets/styles/style.css",
+  "/assets/styles/fonts.css",
+  "/assets/styles/highlight.css",
+];
+
 self.addEventListener("install", (event) =>
-  event.waitUntil(self.skipWaiting())
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_ASSETS)).then(() => self.skipWaiting())
+  )
 );
+
 self.addEventListener("activate", (event) =>
-  event.waitUntil(self.clients.claim())
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  )
 );
 
 const config = require("./config");
@@ -10,7 +29,7 @@ const config = require("./config");
 let streamController, fileName, theKey, state, header, salt, encRx, encTx, decRx, decTx;
 
 self.addEventListener("fetch", (e) => {
-  // console.log(e); // log fetch event
+  // Handle crypto file download
   if (e.request.url.startsWith(config.APP_URL)) {
     const stream = new ReadableStream({
       start(controller) {
@@ -23,93 +42,97 @@ self.addEventListener("fetch", (e) => {
       'attachment; filename="' + fileName + '"'
     );
     e.respondWith(response);
+    return;
+  }
+
+  // Cache-first strategy for static assets, network-first for pages
+  if (e.request.method === "GET" && !e.request.url.includes("_next/webpack-hmr")) {
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        const fetchPromise = fetch(e.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return response;
+        }).catch(() => cached);
+        return cached || fetchPromise;
+      })
+    );
   }
 });
 
 const _sodium = require("libsodium-wrappers-sumo");
+let sodiumReady = false;
+let messageQueue = [];
+let handleMessage = null;
+
+// Register message handler synchronously at top level (required by SW spec)
+addEventListener("message", (e) => {
+  if (!sodiumReady) {
+    messageQueue.push(e);
+    return;
+  }
+  handleMessage(e);
+});
+
+// handleMessage is defined inside the async IIFE below once sodium is ready
+
 (async () => {
   await _sodium.ready;
   const sodium = _sodium;
+  sodiumReady = true;
 
-  addEventListener("message", (e) => {
+  // Override handleMessage now that all functions are defined below
+  handleMessage = function(e) {
     switch (e.data.cmd) {
       case "prepareFileNameEnc":
         assignFileNameEnc(e.data.fileName, e.source);
         break;
-
       case "prepareFileNameDec":
         assignFileNameDec(e.data.fileName, e.source);
         break;
-
       case "requestEncryption":
         encKeyGenerator(e.data.password, e.source);
         break;
-
       case "requestEncKeyPair":
         encKeyPair(e.data.privateKey, e.data.publicKey, e.data.mode, e.source);
         break;
-
       case "asymmetricEncryptFirstChunk":
         asymmetricEncryptFirstChunk(e.data.chunk, e.data.last, e.source);
         break;
-
       case "encryptFirstChunk":
         encryptFirstChunk(e.data.chunk, e.data.last, e.source);
         break;
-
       case "encryptRestOfChunks":
         encryptRestOfChunks(e.data.chunk, e.data.last, e.source);
         break;
-
       case "checkFile":
         checkFile(e.data.signature, e.data.legacy, e.source);
         break;
-
       case "requestTestDecryption":
-        testDecryption(
-          e.data.password,
-          e.data.signature,
-          e.data.salt,
-          e.data.header,
-          e.data.decFileBuff,
-          e.source
-        );
+        testDecryption(e.data.password, e.data.signature, e.data.salt, e.data.header, e.data.decFileBuff, e.source);
         break;
-
       case "requestDecKeyPair":
-        requestDecKeyPair(
-          e.data.privateKey,
-          e.data.publicKey,
-          e.data.header,
-          e.data.decFileBuff,
-          e.data.mode,
-          e.source
-        );
+        requestDecKeyPair(e.data.privateKey, e.data.publicKey, e.data.header, e.data.decFileBuff, e.data.mode, e.source);
         break;
-
       case "requestDecryption":
-        decKeyGenerator(
-          e.data.password,
-          e.data.signature,
-          e.data.salt,
-          e.data.header,
-          e.source
-        );
+        decKeyGenerator(e.data.password, e.data.signature, e.data.salt, e.data.header, e.source);
         break;
-
       case "decryptFirstChunk":
         decryptChunks(e.data.chunk, e.data.last, e.source);
         break;
-
       case "decryptRestOfChunks":
         decryptChunks(e.data.chunk, e.data.last, e.source);
         break;
-
       case "pingSW":
-        // console.log("SW running");
         break;
     }
-  });
+  };
+
+  // Process any messages that arrived before sodium was ready
+  messageQueue.forEach(handleMessage);
+  messageQueue = [];
 
   const assignFileNameEnc = (name, client) => {
     fileName = name;
