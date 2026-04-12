@@ -23,6 +23,14 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import HistoryIcon from "@mui/icons-material/History";
+import Chip from "@mui/material/Chip";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import Divider from "@mui/material/Divider";
 import { getTranslations as t } from "../../locales";
 
 const _sodium = require("libsodium-wrappers-sumo");
@@ -68,12 +76,50 @@ export default function TransferPanel() {
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
 
+  // Server status
+  const [serverStatus, setServerStatus] = useState("checking"); // "checking" | "online" | "offline"
+
+  // Transfer history
+  const [history, setHistory] = useState([]);
+
   // Refs for cleanup
   const wsRef = useRef(null);
   const pcRef = useRef(null);
   const dcRef = useRef(null);
   const isMountedRef = useRef(true);
   const turnRef = useRef(null);
+
+  // Load history from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("transferHistory");
+      if (stored) setHistory(JSON.parse(stored));
+    } catch (_) {}
+  }, []);
+
+  // Check signaling server status
+  useEffect(() => {
+    const wsUrl = SIGNALING_URL.replace("wss://", "https://").replace("ws://", "http://");
+    const checkStatus = () => {
+      const ws = new WebSocket(SIGNALING_URL);
+      const timeout = setTimeout(() => {
+        ws.close();
+        if (isMountedRef.current) setServerStatus("offline");
+      }, 5000);
+      ws.onopen = () => {
+        clearTimeout(timeout);
+        ws.close();
+        if (isMountedRef.current) setServerStatus("online");
+      };
+      ws.onerror = () => {
+        clearTimeout(timeout);
+        if (isMountedRef.current) setServerStatus("offline");
+      };
+    };
+    checkStatus();
+    const interval = setInterval(checkStatus, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -121,6 +167,25 @@ export default function TransferPanel() {
     setReceivedFileName("");
     setDownloadBlob(null);
     setErrorMessage("");
+  };
+
+  const addToHistory = (fileName, fileSize, direction) => {
+    const entry = {
+      name: fileName,
+      size: fileSize,
+      direction, // "sent" or "received"
+      date: new Date().toISOString(),
+    };
+    const updated = [entry, ...history].slice(0, 20); // keep last 20
+    setHistory(updated);
+    try {
+      localStorage.setItem("transferHistory", JSON.stringify(updated));
+    } catch (_) {}
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem("transferHistory");
   };
 
   const handleModeChange = (newMode) => {
@@ -399,6 +464,7 @@ export default function TransferPanel() {
           if (isLast) {
             if (isMountedRef.current) {
               setTransferDone(true);
+              addToHistory(file.name, file.size, "sent");
             }
           } else {
             sendNextChunk();
@@ -515,6 +581,7 @@ export default function TransferPanel() {
             const meta = JSON.parse(e.data);
             receiverState.meta = meta;
             receiverState.fileSize = meta.size;
+            receiverState.fileName = meta.name;
             setReceivedFileName(meta.name);
             setTotalSize(meta.size);
             return;
@@ -579,6 +646,7 @@ export default function TransferPanel() {
               const blob = new Blob(receiverState.receivedChunks);
               setDownloadBlob(blob);
               setTransferDone(true);
+              addToHistory(receiverState.fileName, receiverState.fileSize, "received");
             }
           } catch (err) {
             setErrorMessage(
@@ -1237,16 +1305,109 @@ export default function TransferPanel() {
         </Box>
       )}
 
-      <Typography
+      <Box
         sx={{
-          fontSize: 12,
-          textAlign: "center",
-          marginTop: "15px",
-          color: "rgba(0, 0, 0, 0.54)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: "15px",
+          px: "4px",
         }}
       >
-        Files are encrypted end-to-end. The server never sees your data.
-      </Typography>
+        <Chip
+          size="small"
+          label={
+            serverStatus === "checking"
+              ? "Checking server..."
+              : serverStatus === "online"
+              ? "Server online"
+              : "Server offline"
+          }
+          sx={{
+            backgroundColor:
+              serverStatus === "online"
+                ? "#e8f5e9"
+                : serverStatus === "offline"
+                ? "#fdecea"
+                : "#f3f3f3",
+            color:
+              serverStatus === "online"
+                ? "#2e7d32"
+                : serverStatus === "offline"
+                ? "#611a15"
+                : "rgba(0,0,0,0.54)",
+            fontSize: 11,
+          }}
+        />
+        <Typography
+          sx={{
+            fontSize: 12,
+            color: "rgba(0, 0, 0, 0.54)",
+          }}
+        >
+          End-to-end encrypted
+        </Typography>
+      </Box>
+
+      {history.length > 0 && (
+        <Box sx={{ mt: "20px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: "8px",
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: "rgba(0,0,0,0.54)",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+              }}
+            >
+              <HistoryIcon sx={{ fontSize: 16 }} />
+              Transfer History
+            </Typography>
+            <Button
+              size="small"
+              onClick={clearHistory}
+              sx={{
+                fontSize: 11,
+                textTransform: "none",
+                color: "rgba(0,0,0,0.4)",
+              }}
+            >
+              Clear
+            </Button>
+          </Box>
+          <List
+            dense
+            sx={{
+              backgroundColor: "#f9f9f9",
+              borderRadius: "8px",
+              maxHeight: "200px",
+              overflow: "auto",
+            }}
+          >
+            {history.map((entry, i) => (
+              <ListItem key={i} sx={{ py: "2px" }}>
+                <ListItemText
+                  primary={entry.name}
+                  secondary={`${formatBytes(entry.size)} · ${
+                    entry.direction === "sent" ? "Sent" : "Received"
+                  } · ${new Date(entry.date).toLocaleString()}`}
+                  primaryTypographyProps={{ fontSize: 13, noWrap: true }}
+                  secondaryTypographyProps={{ fontSize: 11 }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      )}
     </div>
   );
 }

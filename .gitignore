@@ -36,3 +36,4 @@ yarn-error.log*
 .vercel
 test-results/
 e2e/testfile.txt
+server/node_modules/

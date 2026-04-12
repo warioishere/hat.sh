@@ -8,6 +8,7 @@ import {
   crypto_secretstream_xchacha20poly1305_ABYTES,
   CHUNK_SIZE,
 } from "../config/Constants";
+import { unzipSync } from "fflate";
 import { Alert, AlertTitle } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Stepper from "@mui/material/Stepper";
@@ -408,17 +409,47 @@ export default function DecryptionPanel() {
         const chunks = [];
         let totalBytes = 0;
         const pump = () =>
-          reader.read().then(({ done, value }) => {
+          reader.read().then(async ({ done, value }) => {
             if (done) {
               const blob = new Blob(chunks);
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = formatName(files[currFile].name);
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
+              const arr = new Uint8Array(await blob.arrayBuffer());
+
+              // Check if decrypted file is a ZIP (magic bytes: PK\x03\x04)
+              if (arr[0] === 0x50 && arr[1] === 0x4B && arr[2] === 0x03 && arr[3] === 0x04) {
+                try {
+                  const unzipped = unzipSync(arr);
+                  for (const [name, data] of Object.entries(unzipped)) {
+                    const fileBlob = new Blob([data]);
+                    const url = URL.createObjectURL(fileBlob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = name;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }
+                } catch {
+                  // Not a valid ZIP, download as-is
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = formatName(files[currFile].name);
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }
+              } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = formatName(files[currFile].name);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }
               return;
             }
             chunks.push(value);

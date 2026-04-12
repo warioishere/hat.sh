@@ -8,6 +8,7 @@ import { generatePassword } from "../utils/generatePassword";
 import { computePublicKey } from "../utils/computePublicKey";
 import passwordStrengthCheck from "../utils/passwordStrengthCheck";
 import { CHUNK_SIZE } from "../config/Constants";
+import { zipSync } from "fflate";
 import { Alert, AlertTitle } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Stepper from "@mui/material/Stepper";
@@ -291,13 +292,34 @@ export default function EncryptionPanel() {
   };
 
   const handleEncryptedFilesDownload = async (e) => {
-    numberOfFiles = Files.length;
-    prepareFile();
+    if (Files.length > 1) {
+      // ZIP multiple files, then encrypt the ZIP
+      setIsDownloading(true);
+      setProgress(0);
+      setProcessedBytes(0);
+
+      const zipData = {};
+      for (const f of Files) {
+        const buf = await f.arrayBuffer();
+        zipData[f.name] = new Uint8Array(buf);
+      }
+      const zipped = zipSync(zipData);
+      const zipBlob = new Blob([zipped]);
+      file = new File([zipBlob], "files.zip", { type: "application/zip" });
+      files = [file];
+      numberOfFiles = 1;
+      currFile = 0;
+      prepareFile();
+    } else {
+      numberOfFiles = Files.length;
+      prepareFile();
+    }
   };
 
   const prepareFile = () => {
     // send file name to sw
-    let fileName = encodeURIComponent(files[currFile].name + ".enc");
+    const name = files.length > 1 ? files[currFile].name : files[currFile].name;
+    let fileName = encodeURIComponent(name + ".enc");
     navigator.serviceWorker.ready.then((reg) => {
       reg.active.postMessage({ cmd: "prepareFileNameEnc", fileName });
     });
@@ -476,22 +498,8 @@ export default function EncryptionPanel() {
           break;
 
         case "encryptionFinished":
-          if (numberOfFiles > 1) {
-            updateCurrFile();
-            file = null;
-            index = null;
-            if (currFile <= numberOfFiles - 1) {
-              setTimeout(function () {
-                prepareFile();
-              }, 1000);
-            } else {
-              setIsDownloading(false);
-              handleNext();
-            }
-          } else {
-            setIsDownloading(false);
-            handleNext();
-          }
+          setIsDownloading(false);
+          handleNext();
           break;
       }
     });

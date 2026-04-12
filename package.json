@@ -1,6 +1,6 @@
 {
   "name": "hat.sh",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "private": true,
   "scripts": {
     "dev": "esbuild service-worker/sw.js --bundle --platform=browser --external:node:fs --external:node:crypto --outfile=public/service-worker.js && next dev",
@@ -15,6 +15,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.10",
     "@mui/material": "^7.3.10",
+    "fflate": "^0.8.2",
     "libsodium-wrappers-sumo": "^0.8.3",
     "marked": "^18.0.0",
     "marked-gfm-heading-id": "^4.1.4",

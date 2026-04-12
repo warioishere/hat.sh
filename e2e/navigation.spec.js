@@ -98,6 +98,6 @@ test.describe("Navigation & UI", () => {
     await page.goto("/");
     await page.waitForTimeout(1000);
 
-    await expect(page.locator("text=v3.0.1")).toBeVisible();
+    await expect(page.locator("text=v3.0.2")).toBeVisible();
   });
 });
