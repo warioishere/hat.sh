@@ -190,22 +190,17 @@ const contentSx = {
 export default function About(props) {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [docContent, setDocContent] = useState("");
-
-  useEffect(() => {
-    const getLocale = () => {
-      if (typeof window !== "undefined") {
-        let language = window.localStorage.getItem("language");
-        let userLanguage = navigator.language.replace("-", "_");
-        return language ? language : locales[userLanguage] ? userLanguage : "en_US";
-      }
-    };
-
-    const locale = getLocale();
+  const getDocContent = () => {
+    if (typeof window === "undefined") return props.docs[0]?.content || "";
+    const language = window.localStorage.getItem("language");
+    const userLanguage = navigator.language.replace("-", "_");
+    const locale = language ? language : locales[userLanguage] ? userLanguage : "en_US";
     const match = props.docs.find((doc) => doc.lang === locale);
     const fallback = props.docs.find((doc) => doc.lang === "en_US");
-    setDocContent(match ? match.content : fallback ? fallback.content : "");
-  }, [props.docs]);
+    return match ? match.content : fallback ? fallback.content : "";
+  };
+
+  const docContent = getDocContent();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
