@@ -201,34 +201,10 @@ export default function About(props) {
       }
     };
 
-    let languages = props.docs;
-    let langFilter = { lang: getLocale() };
-    let langResult;
-
-    languages.forEach(function (obj) {
-      let matches = true;
-      for (let key in langFilter) {
-        if (langFilter[key] !== obj[key]) {
-          matches = false;
-        }
-      }
-      if (matches) {
-        langResult = obj;
-      } else {
-        //default en docs
-        setDocContent(languages[0].content);
-      }
-    });
-
-    const getContent = async () => {
-      for (const key in langResult) {
-        if (key == "content") {
-          setDocContent(langResult[key]);
-        }
-      }
-    };
-
-    getContent();
+    const locale = getLocale();
+    const match = props.docs.find((doc) => doc.lang === locale);
+    const fallback = props.docs.find((doc) => doc.lang === "en_US");
+    setDocContent(match ? match.content : fallback ? fallback.content : "");
   }, [props.docs]);
 
   const handleDrawerToggle = () => {
