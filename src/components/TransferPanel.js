@@ -47,7 +47,10 @@ function buildRtcConfig(turn) {
   return { iceServers };
 }
 
+import { useRouter } from "next/router";
+
 export default function TransferPanel() {
+  const router = useRouter();
   const [mode, setMode] = useState("send");
   const [activeStep, setActiveStep] = useState(0);
 
@@ -96,6 +99,14 @@ export default function TransferPanel() {
       if (stored) setHistory(JSON.parse(stored));
     } catch (_) {}
   }, []);
+
+  // Auto-fill room code from URL query parameter
+  useEffect(() => {
+    if (router.query.room) {
+      setMode("receive");
+      setRoomInput(router.query.room);
+    }
+  }, [router.query.room]);
 
   // Check signaling server status
   useEffect(() => {
@@ -210,6 +221,12 @@ export default function TransferPanel() {
   const copyRoomCode = () => {
     navigator.clipboard.writeText(roomCode);
     showSnackBar("Room code copied to clipboard");
+  };
+
+  const copyShareLink = () => {
+    const link = window.location.origin + "/?tab=transfer&room=" + roomCode;
+    navigator.clipboard.writeText(link);
+    showSnackBar("Link copied to clipboard");
   };
 
   // ─── File input handler ────────────────────────────────────────────────────
@@ -928,10 +945,23 @@ export default function TransferPanel() {
                 >
                   {roomCode}
                 </Typography>
-                <IconButton onClick={copyRoomCode} size="small">
+                <IconButton onClick={copyRoomCode} size="small" title="Copy code">
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Box>
+              <Button
+                onClick={copyShareLink}
+                size="small"
+                startIcon={<ContentCopyIcon />}
+                sx={{
+                  textTransform: "none",
+                  color: "rgba(0,0,0,0.54)",
+                  fontSize: 12,
+                  mb: "8px",
+                }}
+              >
+                Copy share link
+              </Button>
 
               {!peerConnected ? (
                 <Box
